@@ -37,7 +37,7 @@ int nex = 0;
 //TODO look in utilities.h for useful functions, particularly strip_unwanted_chars!
 
 //zero out array that tracks words and their occurrences
-void clearArray(){
+void clearArray() {
 	for (int i = 0; i < nex; i++) {
 		arrayOfWords[i].word = "";
 		arrayOfWords[i].count = 0;
@@ -57,15 +57,27 @@ int getArrayWord_NumbOccur_At(int i) {
 	return arrayOfWords[i].count;
 }
 
-
-
-/*Keep track of how many times each token seen*///might need to swap w processLine
+/*Keep track of how many times each token seen*/ //might need to swap w processLine
 void processToken(std::string &token) {
+	bool used = false;
+	strip_unwanted_chars(token);
+
+	for (int i = 0; i < nex; i++) {
+		if (arrayOfWords[i].word == token) {
+			arrayOfWords[i].count++;
+			used = true;
+		}
+	}
+	if (!used) {
+		arrayOfWords[nex].word == token;
+		arrayOfWords[nex].count = 1;
+		nex++;
+	}
 	return;
 }
 
 /*take 1 line and extract all the tokens from it
-feed each token to processToken for recording*/
+ feed each token to processToken for recording*/
 void processLine(std::string &myString) {
 	stringstream ss(myString);
 	string tempToken;
@@ -84,27 +96,29 @@ bool processFile(std::fstream &myfstream) {
 		return false;
 	}
 
-	/*fstream myfile;
-	myfile.open(myfstream.c_str(),ios::out);
+//	fstream myfile;
+//	myfile.open(myfstream.c_str(), ios::out);
 
-	while (myfile.eof()) {
-		processLine("");
+	string line;
+	while (!myfstream.eof()) {
+		getline(myfstream, line);
+		processLine(line);
 	}
 
-	myfile.close();*/
+//	myfile.closeFile();
 	return true;
 }
 
 /*if you are debugging the file must be in the project parent directory
-  in this case Project2 with the .project and .cProject files*/
-bool openFile(std::fstream& myfile, const std::string& myFileName,
+ in this case Project2 with the .project and .cProject files*/
+bool openFile(std::fstream &myfile, const std::string &myFileName,
 		std::ios_base::openmode mode) {
 	myfile.open(myFileName.c_str(), mode);
 	return myfile.is_open();
 }
 
 /*iff myfile is open then close it*/
-void closeFile(std::fstream& myfile) {
+void closeFile(std::fstream &myfile) {
 	if (myfile.is_open()) {
 		myfile.close();
 	}
@@ -121,7 +135,7 @@ int writeArraytoFile(const std::string &outputfilename) {
 		return FAIL_NO_ARRAY_DATA;
 	}
 	fstream myfile;
-	myfile.open(outputfilename.c_str(),ios::out);
+	myfile.open(outputfilename.c_str(), ios::out);
 
 	if (!myfile.is_open()) {
 		return FAIL_FILE_DID_NOT_OPEN;
@@ -142,5 +156,30 @@ int writeArraytoFile(const std::string &outputfilename) {
  * The presence of the enum implies a switch statement based on its value
  */
 void sortArray(constants::sortOrder so) {
-	return;
+	string tempA = "";
+	string tempB = "";
+	bool sorted = true;
+
+	//ascending
+	int curr = 0;
+	int nextt = 1;
+	bool swa = true;
+	while (sorted && swa) {
+		if (arrayOfWords[nextt].word == "") {
+			curr = 0;
+			nextt = 1;
+		}
+		tempA = arrayOfWords[curr].word;
+		tempB = arrayOfWords[nextt].word;
+		if (tempB < tempA) {
+			arrayOfWords[curr].word = tempB;
+			arrayOfWords[nextt].word = tempA;
+		} else {
+			//die
+		}
+
+		sorted = false;
+
+		return;
+	}
 }
