@@ -38,6 +38,7 @@ int nex = 0;
 
 //zero out array that tracks words and their occurrences
 void clearArray() {
+	nex = 0;
 	for (int i = 0; i < nex; i++) {
 		arrayOfWords[i].word = "";
 		arrayOfWords[i].count = 0;
@@ -60,18 +61,25 @@ int getArrayWord_NumbOccur_At(int i) {
 /*Keep track of how many times each token seen*/ //might need to swap w processLine
 void processToken(std::string &token) {
 	bool used = false;
-	strip_unwanted_chars(token);
+	if (strip_unwanted_chars(token)) {
 
-	for (int i = 0; i < nex; i++) {
-		if (arrayOfWords[i].word == token) {
-			arrayOfWords[i].count++;
-			used = true;
+		for (int i = 0; i < nex; i++) {
+			string temps = arrayOfWords[i].word;
+			string ttoken = token;
+
+			toUpper(temps);
+			toUpper(ttoken);
+
+			if (temps == ttoken) {
+				arrayOfWords[i].count++;
+				used = true;
+			}
 		}
-	}
-	if (!used) {
-		arrayOfWords[nex].word == token;
-		arrayOfWords[nex].count = 1;
-		nex++;
+		if (!used) {
+			arrayOfWords[nex].word = token;
+			arrayOfWords[nex].count = 1;
+			nex++;
+		}
 	}
 	return;
 }
@@ -122,6 +130,7 @@ void closeFile(std::fstream &myfile) {
 	if (myfile.is_open()) {
 		myfile.close();
 	}
+
 	return;
 }
 
@@ -134,15 +143,18 @@ int writeArraytoFile(const std::string &outputfilename) {
 	if (nex == 0) {
 		return FAIL_NO_ARRAY_DATA;
 	}
-	fstream myfile;
+	ofstream myfile;
 	myfile.open(outputfilename.c_str(), ios::out);
 
 	if (!myfile.is_open()) {
 		return FAIL_FILE_DID_NOT_OPEN;
 	}
 
-	while (myfile.eof()) {
-		processFile(myfile);
+	for (int i = 0; i < nex; i++) {
+		myfile << arrayOfWords[i].word;
+		myfile << " ";
+		myfile << arrayOfWords[i].count;
+		myfile << "\n";
 	}
 
 	myfile.close();
@@ -156,30 +168,35 @@ int writeArraytoFile(const std::string &outputfilename) {
  * The presence of the enum implies a switch statement based on its value
  */
 void sortArray(constants::sortOrder so) {
-	string tempA = "";
-	string tempB = "";
-	bool sorted = true;
+	string tempA;
+	string tempB;
 
-	//ascending
-	int curr = 0;
-	int nextt = 1;
-	bool swa = true;
-	while (sorted && swa) {
-		if (arrayOfWords[nextt].word == "") {
-			curr = 0;
-			nextt = 1;
+	switch (so) {
+	// There are more cases that are not covered here
+	case sortOrder::ASCENDING:
+
+		// goes through every possible pairing and compares and swaps
+		for (int i = 0; i < nex - 1; i++) {
+			for (int j = 0; j < nex - 1 - i; j++) {
+				tempA = (arrayOfWords[j].word);
+				tempB = arrayOfWords[j + 1].word;
+				toUpper(tempA);
+				toUpper(tempB);
+
+				if (tempA > tempB) {
+					wordCount temp = arrayOfWords[j];
+					arrayOfWords[j] = arrayOfWords[j + 1];
+					arrayOfWords[j + 1] = temp;
+				}
+			}
 		}
-		tempA = arrayOfWords[curr].word;
-		tempB = arrayOfWords[nextt].word;
-		if (tempB < tempA) {
-			arrayOfWords[curr].word = tempB;
-			arrayOfWords[nextt].word = tempA;
-		} else {
-			//die
+
+		// test if it works
+		for (int i = 0; i < nex; i++) {
+			std::cout << arrayOfWords[i].word;
+			std::cout << "\n";
 		}
-
-		sorted = false;
-
-		return;
+		break;
 	}
+
 }
